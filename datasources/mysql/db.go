@@ -17,7 +17,7 @@ func init() {
 	jsonPath 	:= ""
 
 	if len(args) < 2 {
-		jsonPath = "assets/json/user_db.json"
+		jsonPath = "assets/json/db.json"
 	}else {
 		jsonPath = args[1]
 	}
