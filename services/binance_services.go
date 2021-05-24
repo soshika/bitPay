@@ -108,6 +108,8 @@ func (s *binancesService) CancelOrder(user users.User, getOrder binance2.GetOrde
 		return responses.NewBadRequestError("Bad request", err.Error(), http.StatusBadRequest)
 	}
 
+	_  = order.Delete()
+
 	logger.Info("Close from CancelOrder service successfully")
 	return nil
 }

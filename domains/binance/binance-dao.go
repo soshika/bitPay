@@ -9,6 +9,7 @@ import (
 const (
 	queryInsertOrder = "INSERT INTO order (user_id, symbol, order_id, client_order_id, transact_time, price) VALUES(?, ?, ?, ?, ?, ?);"
 	querySelectOrder = "SELECT id, symbol, client_order_id, transact_time, price FROM order WHERE user_id=? AND order_id=?;"
+	queryDeleteOrder = "DELETE FROM order WHERE user_id=? AND order_id=?;"
 )
 
 func (order *Order) Save() *responses.Response {
@@ -45,5 +46,23 @@ func (order *Order) Get() *responses.Response {
 		return responses.NewInternalServerError("Internal Server Error", "")
 
 	}
+
+	return nil
+}
+
+func (order *Order) Delete() *responses.Response {
+	stmt, err := mysql.Client.Prepare(queryDeleteOrder)
+	if err != nil {
+		logger.Error("error when trying to prepare delete order statement", err)
+		return responses.NewInternalServerError("Internal Server Error", "Please try again later...")
+	}
+	defer stmt.Close()
+
+	_, delErr := stmt.Exec(order.UserId, order.OrderID)
+	if delErr != nil {
+		logger.Error("error when trying to delete order", delErr)
+		return responses.NewInternalServerError("Internal Server Error", "Please try again later...")
+	}
+
 	return nil
 }
