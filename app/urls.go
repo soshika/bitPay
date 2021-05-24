@@ -11,5 +11,5 @@ func urlPatterns() {
 	router.POST("/balance", binance.GetBalance)
 	router.POST("/getOrder", binance.GetOrder)
 	router.POST("/createOrder", binance.CreateOrder)
-
+	router.POST("/cancelOrder", binance.CancelOrder)
 }

@@ -20,6 +20,7 @@ type binanceServiceInterface interface {
 	GetBalance		(users.User, string, bool)							(*binance.Balance, *responses.Response)
 	CreateOrder		(users.User, binance2.CreateOrderRequest, bool) 	(*binance2.Order, *responses.Response)
 	GetOrder		(users.User, binance2.GetOrderRequest, bool)		(*binance.Order, *responses.Response)
+	CancelOrder		(users.User, binance2.GetOrderRequest, bool) 		*responses.Response
 
 }
 
@@ -80,6 +81,35 @@ func (s *binancesService) GetOrder(user users.User, getOrder binance2.GetOrderRe
 
 	logger.Info("Close from GetOrder service successfully")
 	return orderResponse, nil
+}
+
+func (s *binancesService) CancelOrder(user users.User, getOrder binance2.GetOrderRequest, useTestnet bool) *responses.Response {
+	logger.Info("Enter to CancelOrder service successfully")
+
+	if useTestnet {
+		binance.UseTestnet = true
+	}
+
+	client := binance.NewClient(user.APIKey, user.SecretKey)
+
+	order := binance2.Order{
+		UserId: user.Id,
+		OrderID: getOrder.OrderId,
+	}
+
+	getErr := order.Get()
+	if getErr != nil {
+		return getErr
+	}
+
+	_, err := client.NewCancelOrderService().Symbol(order.Symbol).
+		OrderID(order.OrderID).Do(context.Background())
+	if err != nil {
+		return responses.NewBadRequestError("Bad request", err.Error(), http.StatusBadRequest)
+	}
+
+	logger.Info("Close from CancelOrder service successfully")
+	return nil
 }
 
 func(s *binancesService) GetBalance(client users.User, currency string, useTestnet bool) (*binance.Balance, *responses.Response){

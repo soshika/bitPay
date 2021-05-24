@@ -105,3 +105,38 @@ func GetOrder(c *gin.Context) {
 
 	logger.Info("Close from GetOrder controller successfully")
 }
+
+func CancelOrder(c *gin.Context) {
+	logger.Info("Enter to CancelOrder controller successfully")
+
+	testnet 	:= c.GetHeader("testnet")
+	apiKey 		:= c.GetHeader("api_key")
+	secretKey 	:= c.GetHeader("secret_key")
+
+	useTestnet, _ := strconv.ParseBool(testnet)
+
+	client := users.User{
+		APIKey: apiKey,
+		SecretKey: secretKey,
+	}
+
+	getOrder := binance.GetOrderRequest{}
+	if err := c.ShouldBindJSON(&getOrder); err != nil {
+		logger.Error("error when trying to bind json", err)
+		restError := responses.NewBadRequestError("Invalid json structure","please make sure to send correct json body", http.StatusBadRequest)
+		c.JSON(restError.Status(), restError)
+		return
+	}
+
+	serviceErr := services.BinancesService.CancelOrder(client, getOrder, useTestnet)
+	if serviceErr != nil {
+		c.JSON(serviceErr.Status(), serviceErr)
+		return
+	}
+
+	ok := responses.NewRequestSuccessOk("Order canceled Successfully.", "", nil)
+	c.JSON(http.StatusOK,  ok)
+
+
+	logger.Info("Close from CancelOrder controller successfully")
+}
