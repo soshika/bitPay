@@ -11,7 +11,7 @@ var(
 
 func StartApplication()  {
 	urlPatterns()
-	logger.Info("about to start the application v 2.3 !")
+	logger.Info("about to start the application v 1.0.0 !")
 
 	router.Run(":9092")
 }
