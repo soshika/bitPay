@@ -23,16 +23,17 @@ func init() {
 		jsonPath = args[1]
 	}
 
-	infoDB, parseErr := ParseJson(jsonPath)
+	_, parseErr := ParseJson(jsonPath)
 	if parseErr != nil {
 		logger.Error("error when tyring to parse json", parseErr)
 		panic(parseErr)
 	}
 
-	username := infoDB["username"]
-	password := infoDB["password"]
-	host 	 := infoDB["host"]
-	schema   := infoDB["schema"]
+	// TODO: should change for product or add environment variable
+	username := os.Getenv("username")
+	password := os.Getenv("password")
+	host 	 := os.Getenv("host")
+	schema   := os.Getenv("schema")
 
 	var err error
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
