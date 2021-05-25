@@ -3,6 +3,7 @@ package app
 import (
 	"bitPay/controllers/binance"
 	"bitPay/controllers/ping"
+	"bitPay/controllers/users"
 )
 
 func urlPatterns() {
@@ -14,4 +15,6 @@ func urlPatterns() {
 	router.POST("/cancelOrder", binance.CancelOrder)
 	router.POST("/openOrders", binance.OpenOrders)
 	router.POST("/orders", binance.ListOrders)
+
+	router.POST("user/register", users.UserRegistration)
 }

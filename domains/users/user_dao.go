@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	queryInsertUserAuth		= "INSERT INTO user (id, api_key, secret_key) VALUES(?, ?, ?);"
+	queryInsertUserAuth		= "INSERT INTO user (id, api_key, secret_key, is_test) VALUES(?, ?, ?, ?);"
 	querySelectUser			= "SELECT id, secret_key FROM user WHERE api_key = ?;"
 )
 
@@ -20,7 +20,7 @@ func (user *User) Save() *responses.Response {
 	}
 	defer stmt.Close()
 
-	result, saveErr := stmt.Exec(user.APIKey, user.SecretKey)
+	result, saveErr := stmt.Exec(user.APIKey, user.SecretKey, user.IsTest)
 	if saveErr != nil {
 		logger.Error("error when trying to save user", saveErr)
 		return responses.NewBadRequestError("User Registered before!", "Please make sure to enter new api_key", http.StatusBadRequest)
