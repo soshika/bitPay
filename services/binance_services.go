@@ -21,6 +21,8 @@ type binanceServiceInterface interface {
 	CreateOrder		(users.User, binance2.CreateOrderRequest, bool) 	(*binance2.Order, *responses.Response)
 	GetOrder		(users.User, binance2.GetOrderRequest, bool)		(*binance.Order, *responses.Response)
 	CancelOrder		(users.User, binance2.GetOrderRequest, bool) 		*responses.Response
+	OpenOrders		(users.User, binance2.OpenOrderRequest, bool) 		([]binance2.Order, *responses.Response)
+	ListOrders		(users.User, bool, string) 							([]*binance.Order, *responses.Response)
 
 }
 
@@ -112,6 +114,46 @@ func (s *binancesService) CancelOrder(user users.User, getOrder binance2.GetOrde
 
 	logger.Info("Close from CancelOrder service successfully")
 	return nil
+}
+
+func (s *binancesService) OpenOrders(user users.User, AssetOrders binance2.OpenOrderRequest, useTestnet bool) ([]binance2.Order, *responses.Response) {
+	logger.Info("Enter to OpenOrders service successfully")
+
+	if getErr := user.Get(); getErr != nil {
+		return nil, getErr
+	}
+
+	order := binance2.Order{
+		UserId: user.Id,
+		Symbol: AssetOrders.Symbol,
+	}
+
+	orders, getErr := order.GetAll()
+	if getErr != nil {
+		return nil, getErr
+	}
+
+	logger.Info("Close from OpenOrders service successfully")
+	return orders, nil
+}
+
+func (s *binancesService) ListOrders(user users.User, useTestnet bool, symbol string) ([]*binance.Order, *responses.Response) {
+	logger.Info("Enter to ListOrders service successfully")
+
+	if useTestnet {
+		binance.UseTestnet = true
+	}
+
+	client := binance.NewClient(user.APIKey, user.SecretKey)
+
+	orders, err := client.NewListOrdersService().Symbol(symbol).
+		Do(context.Background())
+	if err != nil {
+		return nil, responses.NewBadRequestError("Bad request", err.Error(), http.StatusBadRequest)
+	}
+
+	logger.Info("Close from ListOrders service successfully")
+	return orders, nil
 }
 
 func(s *binancesService) GetBalance(client users.User, currency string, useTestnet bool) (*binance.Balance, *responses.Response){

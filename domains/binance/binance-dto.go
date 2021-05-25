@@ -22,3 +22,8 @@ type Order struct {
 	TransactTime             	int64  		`json:"transact_time"`
 	Price                    	string 		`json:"price"`
 }
+
+type OpenOrderRequest struct {
+	UserId 		int64		`json:"user_id"`
+	Symbol 		string 		`json:"symbol"`
+}
